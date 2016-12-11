@@ -1,27 +1,58 @@
-#include "D:\Инженерка\TX\TXLib.h"
+п»ї#include "TXLib.h"
 
-int x = 200;
-int y = 300;
-int vragX = 200;
-int vragY = 300;
+int dx = 500;
+int dy = 20;
+int vragX = 500;
+int vragY = 560;
+/*
 int Px = 40;
 int Py = 40;
+*/
+int ox = 2;
+int oy = 300;
 
-void DNN (int x, int y)
+void ikran (int *x, int *y, int granicaPoY)
 {
+    if (*x > txGetExtentX())
+    {
+        *x = txGetExtentX();
+    }
+    if (*y > granicaPoY - 40)
+    {
+        *y = granicaPoY - 40;
+    }
 
+    if (*x < 20)
+    {
+        *x = 20;
+    }
+    if (*y < 0)
+    {
+        *y = 0;
+    }
+
+}
+void ograda(int ox, int oy)
+{
+    txLine(ox,oy,ox+998,oy);
+}
+void DNN (int dx, int dy)
+{
+    txSetColour(RGB(random(255),random(255),random(255)));
     txSetColour(TX_RED);
-    txLine(x-20, y+30,x-20, y);
-    txLine(x, y,      x-20, y);
-    txLine(x, y,      x, y+30);
-    txLine(x-20,y+30, x, y+30);
-    txLine(x-13,y,    x-13, y-10);
-    txLine(x-6, y-10, x-13, y-10);
-    txLine(x-6, y-10, x-6, y);
+    txLine(dx-13,dy+30,    dx-13, dy+40);
+    txLine(dx-6, dy+40, dx-13, dy+40);
+    txLine(dx-6, dy+40, dx-6, dy+30);
+
+    txLine(dx-20, dy+30,dx-20, dy);
+    txLine(dx, dy,      dx-20, dy);
+    txLine(dx, dy,      dx, dy+30);
+    txLine(dx-20,dy+30, dx, dy+30);
+
+
     txSetColour(RGB(random(255),random(255),random(255)));
     txSelectFont ("Times New Roman", 10) ;
-    txTextOut (x-15, y+15, "DN");
-
+    txTextOut (dx-15, dy+15, "DN");
 }
 
 void ZloyDN (int vragX, int vragY)
@@ -38,6 +69,7 @@ void ZloyDN (int vragX, int vragY)
     txTextOut (vragX-15, vragY+15, "DN");
 
 }
+/*
 void pechen(int Px, int Py)
 {
  txSetColour(TX_RED);
@@ -45,6 +77,7 @@ void pechen(int Px, int Py)
  txLine(Px, Py, Px+20, Py);
  txLine(Px+20, Py+40, Px+20, Py);
 }
+*/
 int main()
 {
     txCreateWindow(1000, 600);
@@ -56,19 +89,19 @@ int main()
 
         if (GetAsyncKeyState(VK_LEFT))
         {
-            x = x - 10;
+            dx = dx - 10;
         }
         if (GetAsyncKeyState(VK_RIGHT))
         {
-            x = x + 10;
+            dx = dx + 10;
         }
         if (GetAsyncKeyState(VK_UP))
         {
-            y = y - 10;
+            dy = dy - 10;
         }
         if (GetAsyncKeyState(VK_DOWN))
         {
-            y = y + 10;
+            dy = dy + 10;
         }
 
         if (GetAsyncKeyState(VK_NUMPAD4))
@@ -88,10 +121,14 @@ int main()
             vragY = vragY + 10;
         }
 
-        pechen (40, 40);
-        DNN (x, y);
-        ZloyDN (vragX, vragY);
+        ikran(&dx, &dy, 300);
+        ikran(&vragX, &vragY, 300);
+
+        ograda(2, 300);
+        //pechen(40, 40);
+        DNN(dx, dy);
+        ZloyDN(vragX, vragY);
         txSleep(10);
     }
-return 0;
+    return 0;
 }
