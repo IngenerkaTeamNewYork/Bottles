@@ -69,6 +69,10 @@ void ZloyDN (int vragX, int vragY)
     txTextOut (vragX-15, vragY+15, "DN");
 
 }
+void rndvrr(int *var)
+{
+    *var = RGB(random(255),random(255),random(255));
+}
 /*
 void pechen(int Px, int Py)
 {
@@ -81,10 +85,11 @@ void pechen(int Px, int Py)
 int main()
 {
     txCreateWindow(1000, 600);
-
+    int rndvr = RGB(random(255),random(255),random(255));
     txSetColor(TX_RED, 4);
     while (1)
     {
+        rndvrr();
         txClear();
 
         if (GetAsyncKeyState(VK_LEFT))
