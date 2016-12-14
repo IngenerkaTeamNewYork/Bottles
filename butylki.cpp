@@ -89,7 +89,7 @@ int main()
     txSetColor(TX_RED, 4);
     while (1)
     {
-        rndvrr();
+        rndvrr(&rndvr);
         txClear();
 
         if (GetAsyncKeyState(VK_LEFT))
