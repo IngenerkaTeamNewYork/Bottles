@@ -1,5 +1,7 @@
 #include "D:\Инженерка\TX\TXLib.h"
 
+const int objom_magazina = 10;
+
 struct Bullet
 {
     int x;
@@ -11,8 +13,12 @@ struct Butylka
 {
     int x;
     int y;
-    int hp=10;
+    int hp;
+    int count_bullets;
+    int poryadkovyiNomerPuli;
+    COLORREF color;
 };
+
 /*
 vrag.hp = vrag.hp - 1;
 Butylka vrag = {500, 500, 10};
@@ -37,7 +43,6 @@ void hpvraga
 void drawBullet(Bullet *bullet)
 {
     if (bullet->isVisible) {
-         txSetFillColour(TX_YELLOW);
         txCircle(bullet->x, bullet->y, 3);
         bullet->y = bullet->y + 9;
     }
@@ -46,8 +51,8 @@ void drawBullet(Bullet *bullet)
 void drawBulletVraga(Bullet *bullet)
 {
     if(bullet->isVisible) {
-txCircle(bullet->x, bullet->y, 3);
-bullet->y = bullet->y - 9;
+        txCircle(bullet->x, bullet->y, 3);
+        bullet->y = bullet->y - 9;
     }
 }
 
@@ -74,8 +79,12 @@ void ograda(int ox, int oy)
     txLine(ox,oy,ox+998,oy);
 }
 
-void DNN (int dx, int dy)
-{
+void DNN (int dx, int dy) // but1
+{/*
+    if (txGetPixel(dx, dy) == Butylka->but1->color) {
+        Butylka->but
+    }
+    */
     txSetColour(TX_RED);
     txLine(dx-13,dy+30,    dx-13, dy+40);
     txLine(dx-6, dy+40, dx-13, dy+40);
@@ -106,108 +115,144 @@ void ZloyDN (int vragX, int vragY)
     txTextOut (vragX-15, vragY+15, "DN");
 }
 
+void upravlenieVragom(int* vragX, int* vragY)
+{
+    if (GetAsyncKeyState(VK_NUMPAD4))
+    {
+        *vragX = *vragX - 10;
+    }
+    if (GetAsyncKeyState(VK_NUMPAD6))
+    {
+        *vragX = *vragX + 10;
+    }
+    if (GetAsyncKeyState(VK_NUMPAD8))
+    {
+        *vragY = *vragY - 10;
+    }
+    if (GetAsyncKeyState(VK_NUMPAD5))
+    {
+        *vragY = *vragY + 10;
+    }
+}
+
+void upravleniePervoiButylkoi(int* dx, int* dy)
+{
+    if (GetAsyncKeyState(VK_LEFT))
+    {
+        *dx = *dx - 10;
+    }
+    if (GetAsyncKeyState(VK_RIGHT))
+    {
+        *dx = *dx + 10;
+    }
+    if (GetAsyncKeyState(VK_UP))
+    {
+        *dy = *dy - 10;
+    }
+    if (GetAsyncKeyState(VK_DOWN))
+    {
+        *dy = *dy + 10;
+    }
+}
+
+
+
 int main()
 {
     txDisableAutoPause();
-    const int objom_magazina = 8;
-    Bullet bulletButylki[objom_magazina];// 8 пуль
+                           //   x   y   жизней   пуль               номер пули                цвет
+    Butylka pervayaButylka = {500,  20,   10,    objom_magazina,       0, RGB(random(255),random(255),random(255))};
+    Butylka vrag =           {500, 560,   10,    objom_magazina,       0, RGB(random(255),random(255),random(255))};
 
-    //Делаем все пули невидимыми
-    for (int i = 0; i < objom_magazina; i++) {
+    Bullet bulletButylki[pervayaButylka.count_bullets];             // 8 пуль
+    for (int i = 0; i < pervayaButylka.count_bullets; i++) {        //Делаем все пули невидимыми
         bulletButylki[i] = {0, 0, false};
     }
 
-    Bullet bulletVraga[objom_magazina];// 8 пуль
-
-    //Делаем все пули невидимыми
-    for (int i = 0; i < objom_magazina; i++) {
+    Bullet bulletVraga[vrag.count_bullets];             // 8 пуль
+    for (int i = 0; i < vrag.count_bullets; i++) {      //Делаем все пули невидимыми
         bulletVraga[i] = {0, 0, false};
     }
-
-    int countBullets = 8;
-    int vragX = 500;
-    int vragY = 560;
-    //int ox = 2;
-    //int oy = 300;
-    int dx = 500;
-    int dy = 20;
-    int poryadkovyiNomerPuli = 0;
     int t = 0;
 
     txCreateWindow(1000, 600);
 
     txSetColor(TX_RED, 4);
+
+    //menu
+
+
     while (1)
     {
         txClear();
-
-        if (GetAsyncKeyState(VK_LEFT))
-        {
-            dx = dx - 10;
-        }
-        if (GetAsyncKeyState(VK_RIGHT))
-        {
-            dx = dx + 10;
-        }
-        if (GetAsyncKeyState(VK_UP))
-        {
-            dy = dy - 10;
-        }
-        if (GetAsyncKeyState(VK_DOWN))
-        {
-            dy = dy + 10;
-        }
-
-        if (GetAsyncKeyState(VK_NUMPAD4))
-        {
-            vragX = vragX - 10;
-        }
-        if (GetAsyncKeyState(VK_NUMPAD6))
-        {
-            vragX = vragX + 10;
-        }
-        if (GetAsyncKeyState(VK_NUMPAD8))
-        {
-            vragY = vragY - 10;
-        }
-        if (GetAsyncKeyState(VK_NUMPAD5))
-        {
-            vragY = vragY + 10;
-        }
-
-        ikran (&dx, &dy, 0, 300);
-        ikran (&vragX, &vragY, 300+10, 600);
-
-        if (GetAsyncKeyState(VK_SPACE) && (countBullets > 0)) {
-            bulletButylki[poryadkovyiNomerPuli % objom_magazina] = {dx-10, dy+39, true};
-            poryadkovyiNomerPuli++;
-            countBullets--;
-        }
-
-        if (GetAsyncKeyState(VK_NUMPAD0) && (countBullets > 0)) {
-            bulletVraga[poryadkovyiNomerPuli % objom_magazina] = {vragX-10, vragY-19, true};
-            poryadkovyiNomerPuli++;
-            countBullets--;
-        }
-
         ograda (2, 300);
-        DNN (dx, dy);
-        ZloyDN (vragX, vragY);
+
+        //Указатель (*) нужен для того, чтобы менять значение переменной внутри функции
+        upravlenieVragom        (&vrag.x,           &vrag.y);
+        upravleniePervoiButylkoi(&pervayaButylka.x, &pervayaButylka.y);
+
+        ikran (&pervayaButylka.x, &pervayaButylka.y, 0,   300);
+        ikran (&vrag.x,           &vrag.y,           310, 600);
+
+        if (GetAsyncKeyState(VK_SPACE) && (pervayaButylka.count_bullets > 0)) {
+            bulletButylki[pervayaButylka.poryadkovyiNomerPuli % objom_magazina] = {pervayaButylka.x-10, pervayaButylka.y+39, true};
+            pervayaButylka.poryadkovyiNomerPuli = pervayaButylka.poryadkovyiNomerPuli + 1;
+            pervayaButylka.count_bullets = pervayaButylka.count_bullets - 1;
+        }
+
+        if (GetAsyncKeyState(VK_NUMPAD0) && (vrag.count_bullets > 0)) {
+            bulletVraga[vrag.poryadkovyiNomerPuli % objom_magazina] = {vrag.x-10, vrag.y-19, true};
+            vrag.poryadkovyiNomerPuli = vrag.poryadkovyiNomerPuli + 1;
+            vrag.count_bullets = vrag.count_bullets - 1;
+        }
+
+        if (pervayaButylka.hp > 0) {
+            DNN    (pervayaButylka.x, pervayaButylka.y);
+        }
+        if (vrag.hp > 0) {
+            ZloyDN  (vrag.x, vrag.y);
+        }
 
         for (int i = 0; i < objom_magazina; i++) {
             drawBullet(&bulletButylki[i]);
             drawBulletVraga(&bulletVraga[i]);
 
-            if (abs(bulletButylki[i].x - (vragX + 20)) + abs(bulletButylki[i].y - vragY) < 20) {//попадание {
-                //lifes = lifes - 1;//жизни (как с кл-ом пуль)
+            if (pervayaButylka.hp > 0 &&
+                bulletVraga[i].x <= pervayaButylka.x &&
+                bulletVraga[i].x >= pervayaButylka.x - 20 &&
+                bulletVraga[i].y <= pervayaButylka.y + 30 &&
+                bulletVraga[i].y >= pervayaButylka.y) {//попадание {
+                pervayaButylka.hp = pervayaButylka.hp - 1;//жизни (как с кл-ом пуль)
+                txSleep(10);
             }
-
+            if (abs(bulletButylki[i].x - (vrag.x + 20)) + abs(bulletButylki[i].y - vrag.y) < 20) {//попадание {
+                vrag.hp = vrag.hp - 1;//жизни (как с кл-ом пуль)
+                txSleep(10);
+            }
         }
 
         if (t % 300 == 0) {
-            countBullets++;
+            pervayaButylka.count_bullets++;
+            vrag.count_bullets++;
         }
 
+
+
+        if (pervayaButylka.hp <= 0) {
+            if (txMessageBox ("Начать заново?", "Прочти меня", MB_YESNO) == IDYES)
+            {
+                pervayaButylka = {500,  20,   10,    objom_magazina,       0, RGB(random(255),random(255),random(255))};
+                vrag =           {500, 560,   10,    objom_magazina,       0, RGB(random(255),random(255),random(255))};
+
+                for (int i = 0; i < pervayaButylka.count_bullets; i++) {        //Делаем все пули невидимыми
+                    bulletButylki[i] = {0, 0, false};
+                }
+
+                for (int i = 0; i < vrag.count_bullets; i++) {      //Делаем все пули невидимыми
+                    bulletVraga[i] = {0, 0, false};
+                }
+            }
+        }
 
         txSleep(10);
         t = t + 10;
@@ -218,7 +263,3 @@ int main()
     }
     return 0;
 }
-
-
-
-
