@@ -33,15 +33,15 @@ struct Butylka
 
 void drawBullet(Bullet *bullet)
 {
+    txSetFillColor(TX_BLUE);
     if (bullet->isVisible) {
         txCircle(bullet->x, bullet->y, 3);
         bullet->y = bullet->y + 9;
     }
 }
-
-
 void drawBulletVraga(Bullet *bullet)
 {
+    txSetFillColor(TX_RED);
     if(bullet->isVisible) {
         txCircle(bullet->x, bullet->y, 3);
         bullet->y = bullet->y - 9;
@@ -74,12 +74,13 @@ void fon()
 }
 void ograda(int ox, int oy)
 {
+    txSetColour(TX_BLACK, 5);
     txLine(ox,oy,ox+998,oy);
 }
 
 void DNN (int dx, int dy)
 {
-    txSetColour(TX_RED);
+    txSetColour(TX_BLUE);
     txLine(dx-13,dy+30,    dx-13, dy+40);
     txLine(dx-6, dy+40, dx-13, dy+40);
     txLine(dx-6, dy+40, dx-6, dy+30);
@@ -95,6 +96,7 @@ void DNN (int dx, int dy)
 
 void ZloyDN (int vragX, int vragY)
 {
+    txSetColour(TX_RED);
     txLine(vragX-20, vragY+30,vragX-20, vragY);
     txLine(vragX, vragY,      vragX-20, vragY);
     txLine(vragX, vragY,      vragX, vragY+30);
@@ -204,9 +206,17 @@ void ranen(Butylka* pb, Butylka* vrag, Bullet* bulletButylki, Bullet* bulletVrag
 
         }
 }
-
+void eXit()
+{
+    if (GetAsyncKeyState(VK_ESCAPE))
+        {
+            exit(0);
+        }
+}
 int main()
 {
+
+    eXit();
 
     txDisableAutoPause();
     setlocale(LC_ALL, "Russian");
@@ -238,16 +248,21 @@ int main()
     {
         fon();
         ograda (2, 300);
-
-        txSetFillColor(TX_WHITE);
-        txRectangle(200, 100, 200 + 20*vrag.hp, 120);
-        txRectangle(200, 200, 200 + 20*pb.count_bullets, 220);
+  /*
+        txSetFillColor(TX_RED);
+        txRectangle(50 , 350 - 20*vrag.hp, 150, 550);
+        txSetFillColor(TX_BLUE);
+        txRectangle(50, 50 - 20*pb.hp, 150 , 250);
+        txSetFillColor(TX_GREEN);
+        txRectangle(850, 350 + 20*vrag.count_bullets, 950 , 550);
+        txRectangle(850, 50 + 20*pb.count_bullets, 950 , 250);
+*/
         //Oeacaoaeu (*) io?ai aey oiai, ?oiau iaiyou cia?aiea ia?aiaiiie aioo?e ooieoee
         upravlenieVragom        (&vrag.x,  &vrag.y);
         upravleniePervoiButylkoi(&pb.x,    &pb.y);
 
         ikran (&pb.x,     &pb.y, 0,   300);
-        ikran (&vrag.x,  &vrag.y,310, 600);
+        ikran (&vrag.x,  &vrag.y,312, 600);
 
 
 //-----------------------------------------------------------------------
@@ -265,16 +280,9 @@ int main()
             vrag.count_bullets = vrag.count_bullets - 1;
         }
 //---------------------------------------------------------------------
-        if (pb.hp > 0) {
-            DNN    (pb.x, pb.y);
-        }
-        if (vrag.hp > 0) {
-            ZloyDN  (vrag.x, vrag.y);
-        }
-//---------------------------------------------------------------------
-        ranen(&pb, &vrag, bulletButylki, bulletVraga);
 
-        if (t % 1500 == 0) {
+
+   if (t % 1500 == 0) {
             if (pb.count_bullets < OBJOM_MAGAZINA) {
                 pb.count_bullets++;
             }
@@ -282,7 +290,16 @@ int main()
         }
 
 //---------------------------------------------------------------------
-        if (dead(&pb, &vrag) == false) {
+         if (pb.hp > 0) {
+            DNN    (pb.x, pb.y);
+        }
+        if (vrag.hp > 0) {
+            ZloyDN  (vrag.x, vrag.y);
+        }
+
+//---------------------------------------------------------------------
+        if (dead(&pb, &vrag) == false)
+        {
             break;
         }
  //---------------------------------------------------------------------
@@ -290,10 +307,7 @@ int main()
 
         t = t + 10;
  //---------------------------------------------------------------------
-        if (GetAsyncKeyState(VK_ESCAPE))
-        {
-            exit(0);
-        }
+
     }
     return 0;
 }
