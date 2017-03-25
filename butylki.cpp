@@ -13,6 +13,7 @@
 #endif
 
 const int OBJOM_MAGAZINA = 8;
+int t = 0;
 
 struct Bullet
 {
@@ -71,6 +72,7 @@ void fon()
 
     txBitBlt(txDC(), 0, 0, 1000, 600, kartinka, 0, 0);
     txDeleteDC(kartinka);
+
 }
 void ograda(int ox, int oy)
 {
@@ -206,6 +208,53 @@ void ranen(Butylka* pb, Butylka* vrag, Bullet* bulletButylki, Bullet* bulletVrag
 
         }
 }
+void strelba(Butylka* pb, Butylka* vrag,  Bullet* bulletButylki, Bullet* bulletVraga)
+{
+    if (GetAsyncKeyState(VK_SPACE) && (pb->count_bullets > 0))
+        {
+            bulletButylki[pb->poryadkovyiNomerPuli % OBJOM_MAGAZINA] = {pb->x-10, pb->y+39, true};
+            pb->poryadkovyiNomerPuli = pb->poryadkovyiNomerPuli + 1;
+            pb->count_bullets = pb->count_bullets - 1;
+        }
+
+    if (GetAsyncKeyState(VK_NUMPAD0) && (vrag->count_bullets > 0))
+        {
+            bulletVraga[vrag->poryadkovyiNomerPuli % OBJOM_MAGAZINA] = {vrag->x-10, vrag->y-19, true};
+            vrag->poryadkovyiNomerPuli = vrag->poryadkovyiNomerPuli + 1;
+            vrag->count_bullets = vrag->count_bullets - 1;
+        }
+
+}
+void magazin_shkala(Butylka* vrag, Butylka* pb, Bullet* bulletButylki, Bullet* bulletVraga, int t )
+{
+
+
+
+   if (t % 350 == 0)
+        {
+            if  (pb->count_bullets < OBJOM_MAGAZINA)
+                {
+                 pb->count_bullets++;
+                }
+             if (vrag->count_bullets < OBJOM_MAGAZINA)
+                {
+                 vrag->count_bullets++;
+                }
+
+        }
+         t = t + 10;
+
+         strelba( vrag,  pb,  bulletButylki,  bulletVraga);
+
+            txSetFillColor(TX_RED);
+            txRectangle(25 , 550 - 12.5*vrag->hp, 75, 550);
+            txSetFillColor(TX_BLUE);
+            txRectangle(25, 250 - 12.5*pb->hp, 75 , 250);
+            txSetFillColor(TX_GREEN);
+            txRectangle(925, 550 - 12.5*vrag->count_bullets, 975 , 550);
+            txRectangle(925, 250 - 12.5*pb->count_bullets, 975 , 250);
+}
+
 void eXit()
 {
     if (GetAsyncKeyState(VK_ESCAPE))
@@ -221,7 +270,7 @@ int main()
     txDisableAutoPause();
     setlocale(LC_ALL, "Russian");
 
-                 //   x   y   ?eciae   ioeu               iiia? ioee                oaao
+
     Butylka pb   = {500,  20,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
     Butylka vrag = {500, 560,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
 //---------------------------------------------------------------------
@@ -235,78 +284,47 @@ int main()
     for (int i = 0; i < vrag.count_bullets; i++) {
         bulletVraga[i] = {0, 0, false};
     }
-    int t = 0;
+
 
     txCreateWindow(1000, 600);
-
-
-
 
     txSetColor(TX_RED, 4);
 
     while (1)
     {
         fon();
+        magazin_shkala(&pb,&vrag, bulletButylki,  bulletVraga, t);
+
         ograda (2, 300);
-  /*
-        txSetFillColor(TX_RED);
-        txRectangle(50 , 350 - 20*vrag.hp, 150, 550);
-        txSetFillColor(TX_BLUE);
-        txRectangle(50, 50 - 20*pb.hp, 150 , 250);
-        txSetFillColor(TX_GREEN);
-        txRectangle(850, 350 + 20*vrag.count_bullets, 950 , 550);
-        txRectangle(850, 50 + 20*pb.count_bullets, 950 , 250);
-*/
-        //Oeacaoaeu (*) io?ai aey oiai, ?oiau iaiyou cia?aiea ia?aiaiiie aioo?e ooieoee
+
         upravlenieVragom        (&vrag.x,  &vrag.y);
         upravleniePervoiButylkoi(&pb.x,    &pb.y);
 
-        ikran (&pb.x,     &pb.y, 0,   300);
-        ikran (&vrag.x,  &vrag.y,312, 600);
+        ikran ( &pb.x,     &pb.y, 0,   300);
+        ikran  (&vrag.x,  &vrag.y,312, 600);
+       // strelba(&pb,  &vrag,bulletButylki,  bulletVraga);
+        ranen  (&pb,  &vrag,  bulletButylki,  bulletVraga);
 
 
-//-----------------------------------------------------------------------
-        if (GetAsyncKeyState(VK_SPACE) && (pb.count_bullets > 0))
+         if (pb.hp > 0)
         {
-            bulletButylki[pb.poryadkovyiNomerPuli % OBJOM_MAGAZINA] = {pb.x-10, pb.y+39, true};
-            pb.poryadkovyiNomerPuli = pb.poryadkovyiNomerPuli + 1;
-            pb.count_bullets = pb.count_bullets - 1;
-        }
-
-        if (GetAsyncKeyState(VK_NUMPAD0) && (vrag.count_bullets > 0))
-        {
-            bulletVraga[vrag.poryadkovyiNomerPuli % OBJOM_MAGAZINA] = {vrag.x-10, vrag.y-19, true};
-            vrag.poryadkovyiNomerPuli = vrag.poryadkovyiNomerPuli + 1;
-            vrag.count_bullets = vrag.count_bullets - 1;
-        }
-//---------------------------------------------------------------------
-
-
-   if (t % 1500 == 0) {
-            if (pb.count_bullets < OBJOM_MAGAZINA) {
-                pb.count_bullets++;
-            }
-            vrag.count_bullets++;
-        }
-
-//---------------------------------------------------------------------
-         if (pb.hp > 0) {
             DNN    (pb.x, pb.y);
         }
-        if (vrag.hp > 0) {
+        if (vrag.hp > 0)
+        {
             ZloyDN  (vrag.x, vrag.y);
         }
 
-//---------------------------------------------------------------------
+
         if (dead(&pb, &vrag) == false)
         {
             break;
         }
- //---------------------------------------------------------------------
+
         txSleep(10);
 
-        t = t + 10;
- //---------------------------------------------------------------------
+
+
 
     }
     return 0;
