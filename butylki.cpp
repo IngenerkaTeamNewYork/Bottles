@@ -2,7 +2,8 @@
 #include "TXLib.h"
 #include <iostream>
 #include <locale>
-
+#include <fstream>
+#include <string>
 
 #ifndef UNICODE
 #define UNICODE
@@ -12,7 +13,7 @@
 #define _UNICODE
 #endif
 
-const int OBJOM_MAGAZINA = 8;
+int OBJOM_MAGAZINA = 8;
 int t = 0;
 
 struct Bullet
@@ -262,8 +263,25 @@ void eXit()
             exit(0);
         }
 }
+
+using namespace std;
 int main()
 {
+    ifstream file("config.txt");
+
+    while(file) {
+        string line;
+        getline(file, line);
+
+        if (line.substr(0, strlen("OBJOM_MAGAZINA = ")) == "OBJOM_MAGAZINA = ") {
+            OBJOM_MAGAZINA= atoi(line.substr(strlen("OBJOM_MAGAZINA = "), 100).c_str());
+        }
+        //cout << line << endl;
+    }
+    file.close();
+    //txSleep(1000);
+    //return 0;
+
 
     eXit();
 
