@@ -12,6 +12,7 @@
 #define _UNICODE
 #endif
 
+const int OBJOM_ZDOROVYA = 10;
 const int OBJOM_MAGAZINA = 8;
 int t = 0;
 
@@ -51,15 +52,15 @@ void drawBulletVraga(Bullet *bullet)
 
 void ikran (int *x, int *y, int minPoY, int maxPoY)
 {
-    if (*x > txGetExtentX()) {
-        *x = txGetExtentX();
+    if (*x > 898) {
+        *x = 898 ;
     }
     if (*y > maxPoY - 40) {
         *y = maxPoY - 40;
     }
 
-    if (*x < 20) {
-        *x = 20;
+    if (*x < 121) {
+        *x = 121;
     }
     if (*y < minPoY) {
         *y = minPoY;
@@ -72,7 +73,6 @@ void fon()
 
     txBitBlt(txDC(), 0, 0, 1000, 600, kartinka, 0, 0);
     txDeleteDC(kartinka);
-
 }
 void ograda(int ox, int oy)
 {
@@ -247,12 +247,12 @@ void magazin_shkala(Butylka* vrag, Butylka* pb, Bullet* bulletButylki, Bullet* b
          strelba( vrag,  pb,  bulletButylki,  bulletVraga);
 
             txSetFillColor(TX_RED);
-            txRectangle(25 , 550 - 12.5*vrag->hp, 75, 550);
+            txRectangle(25 , 550 - 12.5 vrag / OBJOM_ZDOROVYA, 80, 550);
             txSetFillColor(TX_BLUE);
-            txRectangle(25, 250 - 12.5*pb->hp, 75 , 250);
+            txRectangle(25, 250 - 12.5 pb / OBJOM_ZDOROVYA, 80 , 250);
             txSetFillColor(TX_GREEN);
-            txRectangle(925, 550 - 12.5*vrag->count_bullets, 975 , 550);
-            txRectangle(925, 250 - 12.5*pb->count_bullets, 975 , 250);
+            txRectangle(915, 550 - 12.5 pb / OBJOM_MAGAZINA, 980 , 550);
+            txRectangle(915, 250 - 12.5 vrag / OBJOM_MAGAZINA, 980 , 250);
 }
 
 void eXit()
@@ -271,8 +271,8 @@ int main()
     setlocale(LC_ALL, "Russian");
 
 
-    Butylka pb   = {500,  20,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
-    Butylka vrag = {500, 560,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
+    Butylka pb   = {500,  20,   OBJOM_ZDOROVYA,    OBJOM_MAGAZINA,   0};
+    Butylka vrag = {500, 560,   OBJOM_ZDOROVYA,    OBJOM_MAGAZINA,   0};
 //---------------------------------------------------------------------
 
     Bullet bulletButylki[pb.count_bullets];
@@ -288,11 +288,13 @@ int main()
 
     txCreateWindow(1000, 600);
 
-    txSetColor(TX_RED, 4);
-
-    while (1)
+    while (!GetAsyncKeyState(VK_ESCAPE))
     {
+
+
         fon();
+
+
         magazin_shkala(&pb,&vrag, bulletButylki,  bulletVraga, t);
 
         ograda (2, 300);
@@ -320,6 +322,8 @@ int main()
         {
             break;
         }
+
+        t = t + 10;
 
         txSleep(10);
 
