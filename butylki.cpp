@@ -14,7 +14,11 @@
 #endif
 
 int OBJOM_MAGAZINA = 8;
+int MAXIMAL_HP = 8;
+int COUNT_BULLETS = 8;
+int MAX_COUNT_BULLETS = 8;
 int t = 0;
+string KOD;
 
 struct Bullet
 {
@@ -276,21 +280,36 @@ int main()
         if (line.substr(0, strlen("OBJOM_MAGAZINA = ")) == "OBJOM_MAGAZINA = ") {
             OBJOM_MAGAZINA= atoi(line.substr(strlen("OBJOM_MAGAZINA = "), 100).c_str());
         }
-        //cout << line << endl;
+        if (line.substr(0, strlen("MAXIMAL_HP = ")) == "MAXIMAL_HP = ") {
+            MAXIMAL_HP = atoi(line.substr(strlen("MAXIMAL_HP = "), 100).c_str());
+        }
+        if (line.substr(0, strlen("COUNT_BULLETS = ")) == "COUNT_BULLETS = ") {
+            COUNT_BULLETS = atoi(line.substr(strlen("COUNT_BULLETS = "), 100).c_str());
+        }
+        if (line.substr(0, strlen("MAX_COUNT_BULLETS = ")) == "MAX_COUNT_BULLETS = ") {
+            MAX_COUNT_BULLETS = atoi(line.substr(strlen("MAX_COUNT_BULLETS = "), 100).c_str());
+        }
+        if (line.substr(0, strlen("KOD = ")) == "KOD = ") {
+            KOD = line.substr(strlen("KOD = "), 100);
+        }
     }
     file.close();
-    //txSleep(1000);
     //return 0;
 
 
     eXit();
 
+    txCreateWindow(1000, 600);
+
+    int dlina = strlen(KOD.c_str());
+    MAXIMAL_HP = MAXIMAL_HP - dlina;
+
     txDisableAutoPause();
     setlocale(LC_ALL, "Russian");
 
 
-    Butylka pb   = {500,  20,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
-    Butylka vrag = {500, 560,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
+    Butylka pb   = {500,  20,   MAXIMAL_HP,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
+    Butylka vrag = {500, 560,   MAXIMAL_HP,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
 //---------------------------------------------------------------------
 
     Bullet bulletButylki[pb.count_bullets];
@@ -304,13 +323,11 @@ int main()
     }
 
 
-    txCreateWindow(1000, 600);
 
-    txSetColor(TX_RED, 4);
-
-    while (1)
+    while (!GetAsyncKeyState(VK_ESCAPE))
     {
         fon();
+        txClear();
         magazin_shkala(&pb,&vrag, bulletButylki,  bulletVraga, t);
 
         ograda (2, 300);
