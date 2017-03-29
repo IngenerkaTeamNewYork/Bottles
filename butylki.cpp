@@ -247,12 +247,12 @@ void magazin_shkala(Butylka* vrag, Butylka* pb, Bullet* bulletButylki, Bullet* b
          strelba( vrag,  pb,  bulletButylki,  bulletVraga);
 
             txSetFillColor(TX_RED);
-            txRectangle(25 , 550 - 12.5 vrag / OBJOM_ZDOROVYA, 80, 550);
+            txRectangle(25 , 550 - 120 * vrag->hp / OBJOM_ZDOROVYA, 80, 550);
             txSetFillColor(TX_BLUE);
-            txRectangle(25, 250 - 12.5 pb / OBJOM_ZDOROVYA, 80 , 250);
+            txRectangle(25, 250 - 120  * pb->hp / OBJOM_ZDOROVYA, 80 , 250);
             txSetFillColor(TX_GREEN);
-            txRectangle(915, 550 - 12.5 pb / OBJOM_MAGAZINA, 980 , 550);
-            txRectangle(915, 250 - 12.5 vrag / OBJOM_MAGAZINA, 980 , 250);
+            txRectangle(915, 550 - 120 * pb->count_bullets / OBJOM_MAGAZINA, 980 , 550);
+            txRectangle(915, 250 - 120 * vrag->count_bullets / OBJOM_MAGAZINA, 980 , 250);
 }
 
 void eXit()
