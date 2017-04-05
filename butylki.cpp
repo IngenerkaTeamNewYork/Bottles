@@ -2,8 +2,7 @@
 #include "TXLib.h"
 #include <iostream>
 #include <locale>
-#include <fstream>
-#include <string>
+
 
 #ifndef UNICODE
 #define UNICODE
@@ -13,12 +12,9 @@
 #define _UNICODE
 #endif
 
-int OBJOM_MAGAZINA = 8;
-int MAXIMAL_HP = 8;
-int COUNT_BULLETS = 8;
-int MAX_COUNT_BULLETS = 8;
+const int OBJOM_ZDOROVYA = 10;
+const int OBJOM_MAGAZINA = 8;
 int t = 0;
-string KOD;
 
 struct Bullet
 {
@@ -54,17 +50,57 @@ void drawBulletVraga(Bullet *bullet)
     }
 }
 
+void pauza(Butylka* pb, Butylka* vrag)
+{
+    if (GetAsyncKeyState('P')) {
+        txSelectFont("Times New Roman", 50);
+        txSetColor(TX_BLACK);
+        txSetFillColor(TX_GREEN);
+        txRectangle(100, 100, 500, 300);
+        txRectangle(120, 180, 170, 220);
+        txDrawText(120, 180, 170, 220, "-");
+        txRectangle(420, 180, 470, 220);
+        txDrawText(420, 180, 470, 220, "+");
+
+        txSleep(1000);
+        while(!GetAsyncKeyState('P')) {
+            char hp[100];
+            sprintf(hp, "HP = %d", pb->hp);
+            txRectangle(220, 180, 370, 220);
+            txDrawText(220, 180, 370, 220, hp);
+
+            if (txMouseButtons() & 1 &&
+                txMouseX() >=120 &&
+                txMouseX() <=170 &&
+                txMouseY() >=180 &&
+                txMouseY() <=220) {
+                pb->hp = pb->hp - 1;
+            }
+            if (txMouseButtons() & 1 &&
+                txMouseX() >=420 &&
+                txMouseX() <=470 &&
+                txMouseY() >=180 &&
+                txMouseY() <=220) {
+                pb->hp = pb->hp + 1;
+            }
+            txSleep(50);
+        }
+
+        txSleep(1000);
+    }
+}
+
 void ikran (int *x, int *y, int minPoY, int maxPoY)
 {
-    if (*x > txGetExtentX()) {
-        *x = txGetExtentX();
+    if (*x > 898) {
+        *x = 898 ;
     }
     if (*y > maxPoY - 40) {
         *y = maxPoY - 40;
     }
 
-    if (*x < 20) {
-        *x = 20;
+    if (*x < 121) {
+        *x = 121;
     }
     if (*y < minPoY) {
         *y = minPoY;
@@ -77,7 +113,6 @@ void fon()
 
     txBitBlt(txDC(), 0, 0, 1000, 600, kartinka, 0, 0);
     txDeleteDC(kartinka);
-
 }
 void ograda(int ox, int oy)
 {
@@ -159,7 +194,7 @@ void upravleniePervoiButylkoi(int* dx, int* dy)
 bool dead(Butylka* pb, Butylka* vrag)
 {
     if (pb->hp <= 0) {
-        if (txMessageBox (TEXT("Òû îêîí÷àòåëüíî óìåð?"), "Ñîãëàøàéñÿ, âòîðîãî øàíñà íå áóäåò (íî ýòî íåòî÷íî)", MB_YESNO) == IDNO) {
+        if (txMessageBox (TEXT("Ã’Ã» Ã®ÃªÃ®Ã­Ã·Ã Ã²Ã¥Ã«Ã¼Ã­Ã® Ã³Ã¬Ã¥Ã°?"), "Ã‘Ã®Ã£Ã«Ã Ã¸Ã Ã©Ã±Ã¿, Ã¢Ã²Ã®Ã°Ã®Ã£Ã® Ã¸Ã Ã­Ã±Ã  Ã­Ã¥ Ã¡Ã³Ã¤Ã¥Ã² (Ã­Ã® Ã½Ã²Ã® Ã­Ã¥Ã²Ã®Ã·Ã­Ã®)", MB_YESNO) == IDNO) {
             *pb   = {500,  20,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
         } else {
             return false;
@@ -167,7 +202,7 @@ bool dead(Butylka* pb, Butylka* vrag)
     }
 
     if (vrag->hp <= 0) {
-        if (txMessageBox (TEXT("Òû îêîí÷àòåëüíî óìåð?"), "Ñîãëàøàéñÿ, âòîðîãî øàíñà íå áóäåò (íî ýòî íåòî÷íî)", MB_YESNO) == IDNO) {
+        if (txMessageBox (TEXT("Ã’Ã» Ã®ÃªÃ®Ã­Ã·Ã Ã²Ã¥Ã«Ã¼Ã­Ã® Ã³Ã¬Ã¥Ã°?"), "Ã‘Ã®Ã£Ã«Ã Ã¸Ã Ã©Ã±Ã¿, Ã¢Ã²Ã®Ã°Ã®Ã£Ã® Ã¸Ã Ã­Ã±Ã  Ã­Ã¥ Ã¡Ã³Ã¤Ã¥Ã² (Ã­Ã® Ã½Ã²Ã® Ã­Ã¥Ã²Ã®Ã·Ã­Ã®)", MB_YESNO) == IDNO) {
             *vrag = {500, 560,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
         } else {
             return false;
@@ -252,12 +287,12 @@ void magazin_shkala(Butylka* vrag, Butylka* pb, Bullet* bulletButylki, Bullet* b
          strelba( vrag,  pb,  bulletButylki,  bulletVraga);
 
             txSetFillColor(TX_RED);
-            txRectangle(25 , 550 - 12.5*vrag->hp, 75, 550);
+            txRectangle(25 , 550 - 120 * pb->hp / OBJOM_ZDOROVYA, 80, 550);
             txSetFillColor(TX_BLUE);
-            txRectangle(25, 250 - 12.5*pb->hp, 75 , 250);
+            txRectangle(25, 250 - 120  * vrag->hp / OBJOM_ZDOROVYA, 80 , 250);
             txSetFillColor(TX_GREEN);
-            txRectangle(925, 550 - 12.5*vrag->count_bullets, 975 , 550);
-            txRectangle(925, 250 - 12.5*pb->count_bullets, 975 , 250);
+            txRectangle(915, 550 - 120 * pb->count_bullets / OBJOM_MAGAZINA, 980 , 550);
+            txRectangle(915, 250 - 120 * vrag->count_bullets / OBJOM_MAGAZINA, 980 , 250);
 }
 
 void eXit()
@@ -267,49 +302,18 @@ void eXit()
             exit(0);
         }
 }
-
-using namespace std;
 int main()
 {
-    ifstream file("config.txt");
-
-    while(file) {
-        string line;
-        getline(file, line);
-
-        if (line.substr(0, strlen("OBJOM_MAGAZINA = ")) == "OBJOM_MAGAZINA = ") {
-            OBJOM_MAGAZINA= atoi(line.substr(strlen("OBJOM_MAGAZINA = "), 100).c_str());
-        }
-        if (line.substr(0, strlen("MAXIMAL_HP = ")) == "MAXIMAL_HP = ") {
-            MAXIMAL_HP = atoi(line.substr(strlen("MAXIMAL_HP = "), 100).c_str());
-        }
-        if (line.substr(0, strlen("COUNT_BULLETS = ")) == "COUNT_BULLETS = ") {
-            COUNT_BULLETS = atoi(line.substr(strlen("COUNT_BULLETS = "), 100).c_str());
-        }
-        if (line.substr(0, strlen("MAX_COUNT_BULLETS = ")) == "MAX_COUNT_BULLETS = ") {
-            MAX_COUNT_BULLETS = atoi(line.substr(strlen("MAX_COUNT_BULLETS = "), 100).c_str());
-        }
-        if (line.substr(0, strlen("KOD = ")) == "KOD = ") {
-            KOD = line.substr(strlen("KOD = "), 100);
-        }
-    }
-    file.close();
-    //return 0;
-
 
     eXit();
-
-    txCreateWindow(1000, 600);
-
-    int dlina = strlen(KOD.c_str());
-    MAXIMAL_HP = MAXIMAL_HP - dlina;
 
     txDisableAutoPause();
     setlocale(LC_ALL, "Russian");
 
 
-    Butylka pb   = {500,  20,   MAXIMAL_HP,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
-    Butylka vrag = {500, 560,   MAXIMAL_HP,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
+
+    Butylka pb   = {500,  20,   OBJOM_ZDOROVYA,    OBJOM_MAGAZINA,   0};
+    Butylka vrag = {500, 560,   OBJOM_ZDOROVYA,    OBJOM_MAGAZINA,   0};
 //---------------------------------------------------------------------
 
     Bullet bulletButylki[pb.count_bullets];
@@ -323,11 +327,13 @@ int main()
     }
 
 
+    txCreateWindow(1000, 600);
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
         fon();
-        txClear();
+
+
         magazin_shkala(&pb,&vrag, bulletButylki,  bulletVraga, t);
 
         ograda (2, 300);
@@ -337,11 +343,11 @@ int main()
 
         ikran ( &pb.x,     &pb.y, 0,   300);
         ikran  (&vrag.x,  &vrag.y,312, 600);
-       // strelba(&pb,  &vrag,bulletButylki,  bulletVraga);
+        strelba(&pb,  &vrag,bulletButylki,  bulletVraga);
         ranen  (&pb,  &vrag,  bulletButylki,  bulletVraga);
 
 
-         if (pb.hp > 0)
+        if (pb.hp > 0)
         {
             DNN    (pb.x, pb.y);
         }
@@ -356,6 +362,9 @@ int main()
             break;
         }
 
+        t = t + 10;
+
+        pauza(&pb,&vrag);
         txSleep(10);
 
 
