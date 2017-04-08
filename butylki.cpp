@@ -33,12 +33,83 @@ struct Butylka
     COLORREF color;
 };
 
+struct Button
+{
+    int min_x;
+    int min_y;
+    int max_x;
+    int max_y;
+    const char* text;
+    bool (*onClick)();
+};
+
+bool return_to_game()
+{
+    return true;
+}
+
+void draw_button(Button* button)
+{
+    txRectangle(button->min_x, button->min_y, button->max_x, button->max_y);
+    txDrawText(button->min_x, button->min_y, button->max_x, button->max_y, button->text);
+}
+
+bool is_button_clicked(Button* button)
+{
+    if (txMouseX() >= button->min_x &&
+        txMouseX() <= button->max_x &&
+        txMouseY() >= button->min_y &&
+        txMouseY() <= button->max_y &&
+        txMouseButtons() & 1) {
+            return true;
+        }
+    return false;
+}
+
+void pause(Butylka* butylki_usera, int* kolichestvo_butylok_usera)
+{
+    bool isreturn = false;
+
+    if (GetAsyncKeyState(VK_ESCAPE)) {
+
+        txSelectFont("Times New Roman", 17);
+
+        txSetColour(TX_BLUE);
+        txRectangle(330, 150, 660, 350);
+        txSetColour(TX_BLACK);
+
+        Button buttonPlay = {440, 178, 550, 206, "Play", return_to_game};
+        Button buttonMenu = {440, 234, 550, 262, "Menu", return_to_game};
+        Button buttonExit = {440, 290, 550, 318, "Exit", return_to_game};
+
+        draw_button(&buttonPlay);
+        draw_button(&buttonMenu);
+        draw_button(&buttonExit);
+
+        while (!isreturn) {
+            if (is_button_clicked(&buttonPlay)) {
+                isreturn = buttonPlay.onClick();
+            }
+            if (is_button_clicked(&buttonMenu))
+            {
+                butylki_usera[*kolichestvo_butylok_usera] = {random(500),  80,   OBJOM_ZDOROVYA,    OBJOM_MAGAZINA,   0};
+                *kolichestvo_butylok_usera = *kolichestvo_butylok_usera + 1;
+                txSleep(1000);
+            }
+            if (is_button_clicked(&buttonExit))
+            {
+               WinExec("D:\\Инженерка\\C++\\Chainik\\Chelovechek\\menu1\\main2.exe",SW_SHOW);
+            }
+            txSleep(10);
+        }
+    }
+}
 void drawBullet(Bullet *bullet)
 {
     txSetFillColor(TX_BLUE);
     if (bullet->isVisible) {
         txCircle(bullet->x, bullet->y, 3);
-        bullet->y = bullet->y + 9;
+        bullet->y = bullet->y + 19;
     }
 }
 void drawBulletVraga(Bullet *bullet)
@@ -46,7 +117,7 @@ void drawBulletVraga(Bullet *bullet)
     txSetFillColor(TX_RED);
     if(bullet->isVisible) {
         txCircle(bullet->x, bullet->y, 3);
-        bullet->y = bullet->y - 9;
+        bullet->y = bullet->y - 19 ;
     }
 }
 
@@ -154,19 +225,27 @@ void upravleniePervoiButylkoi(int* dx, int* dy)
 bool dead(Butylka* pb, Butylka* vrag)
 {
     if (pb->hp <= 0) {
+
+        WinExec("D:\\Инженерка\\C++\\Chainik\\Chelovechek\\menu1\\main2.exe",SW_SHOW);
+            /*
         if (txMessageBox (TEXT("Ты окончательно умер?"), "Соглашайся, второго шанса не будет (но это неточно)", MB_YESNO) == IDNO) {
             *pb   = {500,  20,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
         } else {
             return false;
         }
+        */
     }
 
+
     if (vrag->hp <= 0) {
+          WinExec("D:\\Инженерка\\C++\\Chainik\\Chelovechek\\menu1\\main2.exe",SW_SHOW);
+        /*
         if (txMessageBox (TEXT("Ты окончательно умер?"), "Соглашайся, второго шанса не будет (но это неточно)", MB_YESNO) == IDNO) {
             *vrag = {500, 560,   10,    OBJOM_MAGAZINA,       0, RGB(random(255),random(255),random(255))};
         } else {
             return false;
         }
+    */
     }
 
     return true;
@@ -189,7 +268,6 @@ void ranen(Butylka* pb, Butylka* vrag, Bullet* bulletButylki, Bullet* bulletVrag
             {
                 pb->hp = pb->hp -1;
                 bulletVraga[i].isVisible = false;
-                //txSleep(10);
             }
 
 
@@ -202,7 +280,6 @@ void ranen(Butylka* pb, Butylka* vrag, Bullet* bulletButylki, Bullet* bulletVrag
             {
                 vrag->hp = vrag->hp - 1;
                 bulletButylki[i].isVisible = false;
-                //txSleep(10);
             }
 
 
@@ -230,7 +307,7 @@ void magazin_shkala(Butylka* vrag, Butylka* pb, Bullet* bulletButylki, Bullet* b
 
 
 
-   if (t % 350 == 0)
+   if (t % 50 == 0)
         {
             if  (pb->count_bullets < OBJOM_MAGAZINA)
                 {
@@ -247,9 +324,9 @@ void magazin_shkala(Butylka* vrag, Butylka* pb, Bullet* bulletButylki, Bullet* b
          strelba( vrag,  pb,  bulletButylki,  bulletVraga);
 
             txSetFillColor(TX_RED);
-            txRectangle(25 , 550 - 120 * vrag->hp / OBJOM_ZDOROVYA, 80, 550);
+            txRectangle(25 , 550 - 120 * pb->hp / OBJOM_ZDOROVYA, 80, 550);
             txSetFillColor(TX_BLUE);
-            txRectangle(25, 250 - 120  * pb->hp / OBJOM_ZDOROVYA, 80 , 250);
+            txRectangle(25, 250 - 120  * vrag->hp / OBJOM_ZDOROVYA, 80 , 250);
             txSetFillColor(TX_GREEN);
             txRectangle(915, 550 - 120 * pb->count_bullets / OBJOM_MAGAZINA, 980 , 550);
             txRectangle(915, 250 - 120 * vrag->count_bullets / OBJOM_MAGAZINA, 980 , 250);
@@ -262,15 +339,16 @@ void eXit()
             exit(0);
         }
 }
+
 int main()
 {
-
+    int kolichestvo_butylok_usera = 0;
     eXit();
 
     txDisableAutoPause();
     setlocale(LC_ALL, "Russian");
 
-
+    Butylka butylki_usera[10];
     Butylka pb   = {500,  20,   OBJOM_ZDOROVYA,    OBJOM_MAGAZINA,   0};
     Butylka vrag = {500, 560,   OBJOM_ZDOROVYA,    OBJOM_MAGAZINA,   0};
 //---------------------------------------------------------------------
@@ -288,27 +366,30 @@ int main()
 
     txCreateWindow(1000, 600);
 
-    while (!GetAsyncKeyState(VK_ESCAPE))
+    while (!GetAsyncKeyState('P'))
     {
-
-
         fon();
-
 
         magazin_shkala(&pb,&vrag, bulletButylki,  bulletVraga, t);
 
         ograda (2, 300);
 
+
         upravlenieVragom        (&vrag.x,  &vrag.y);
         upravleniePervoiButylkoi(&pb.x,    &pb.y);
+        for (int i = 0; i < kolichestvo_butylok_usera; i++) {
+            upravleniePervoiButylkoi(&butylki_usera[i].x, &butylki_usera[i].y);
+        }
 
         ikran ( &pb.x,     &pb.y, 0,   300);
         ikran  (&vrag.x,  &vrag.y,312, 600);
+        for (int i = 0; i < kolichestvo_butylok_usera; i++) {
+            ikran(&butylki_usera[i].x, &butylki_usera[i].y, 0,   300);
+        }
        // strelba(&pb,  &vrag,bulletButylki,  bulletVraga);
         ranen  (&pb,  &vrag,  bulletButylki,  bulletVraga);
 
-
-         if (pb.hp > 0)
+        if (pb.hp > 0)
         {
             DNN    (pb.x, pb.y);
         }
@@ -317,19 +398,21 @@ int main()
             ZloyDN  (vrag.x, vrag.y);
         }
 
+        for (int i = 0; i < kolichestvo_butylok_usera; i++) {
+            DNN(butylki_usera[i].x, butylki_usera[i].y);
+        }
+
 
         if (dead(&pb, &vrag) == false)
         {
             break;
         }
 
+        pause(butylki_usera, &kolichestvo_butylok_usera);
         t = t + 10;
 
         txSleep(10);
-
-
-
-
     }
+
     return 0;
 }
