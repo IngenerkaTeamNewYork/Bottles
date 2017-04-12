@@ -33,6 +33,42 @@ struct Butylka
     COLORREF color;
 };
 
+struct Shkala
+{
+    int hintMinX;
+    int hintMaxX;
+    int hintMinY;
+    int hintMaxY;
+    int rectMinX;
+    int rectMaxX;
+    int rectMinY;
+    int rectMaxY;
+    COLORREF color;
+    const char* hint;
+};
+
+void showHint(Shkala* shkala)
+{
+    if (txMouseX() >= shkala->hintMinX &&
+        txMouseX() <= shkala->hintMaxX &&
+        txMouseY() >= shkala->hintMinY &&
+        txMouseY() <= shkala->hintMaxY)
+    {
+        txSelectFont ("Times New Roman", 40) ;
+        txDrawText(txMouseX()-300, txMouseY(),
+                   txMouseX()    , txMouseY() + 100, shkala->hint);
+    }
+}
+
+void drawShkala(Shkala* shkala)
+{
+    txSetFillColor(shkala->color);
+    txRectangle(shkala->rectMinX,
+                shkala->rectMinY,
+                shkala->rectMaxX,
+                shkala->rectMaxY);
+}
+
 void drawBullet(Bullet *bullet)
 {
     txSetFillColor(TX_BLUE);
@@ -267,32 +303,29 @@ void strelba(Butylka* pb, Butylka* vrag,  Bullet* bulletButylki, Bullet* bulletV
 }
 void magazin_shkala(Butylka* vrag, Butylka* pb, Bullet* bulletButylki, Bullet* bulletVraga, int t )
 {
+    if (t % 350 == 0)
+    {
+        if  (pb->count_bullets < OBJOM_MAGAZINA)
+            {
+             pb->count_bullets++;
+            }
+        if (vrag->count_bullets < OBJOM_MAGAZINA)
+            {
+             vrag->count_bullets++;
+            }
 
+    }
+    t = t + 10;
 
+    strelba( vrag,  pb,  bulletButylki,  bulletVraga);
 
-   if (t % 350 == 0)
-        {
-            if  (pb->count_bullets < OBJOM_MAGAZINA)
-                {
-                 pb->count_bullets++;
-                }
-             if (vrag->count_bullets < OBJOM_MAGAZINA)
-                {
-                 vrag->count_bullets++;
-                }
-
-        }
-         t = t + 10;
-
-         strelba( vrag,  pb,  bulletButylki,  bulletVraga);
-
-            txSetFillColor(TX_RED);
-            txRectangle(25 , 550 - 120 * pb->hp / OBJOM_ZDOROVYA, 80, 550);
-            txSetFillColor(TX_BLUE);
-            txRectangle(25, 250 - 120  * vrag->hp / OBJOM_ZDOROVYA, 80 , 250);
-            txSetFillColor(TX_GREEN);
-            txRectangle(915, 550 - 120 * pb->count_bullets / OBJOM_MAGAZINA, 980 , 550);
-            txRectangle(915, 250 - 120 * vrag->count_bullets / OBJOM_MAGAZINA, 980 , 250);
+    txSetFillColor(TX_RED);
+    txRectangle(25 , 550 - 120 * pb->hp / OBJOM_ZDOROVYA, 80, 550);
+    txSetFillColor(TX_BLUE);
+    txRectangle(25, 250 - 120  * vrag->hp / OBJOM_ZDOROVYA, 80 , 250);
+    txSetFillColor(TX_GREEN);
+    txRectangle(915, 550 - 120 * pb->count_bullets / OBJOM_MAGAZINA, 980 , 550);
+    //txRectangle(915, 250 - 120 * vrag->count_bullets / OBJOM_MAGAZINA, 980 , 250);
 }
 
 void eXit()
@@ -325,6 +358,8 @@ int main()
     for (int i = 0; i < vrag.count_bullets; i++) {
         bulletVraga[i] = {0, 0, false};
     }
+
+    Shkala shkala1 = {915, 980, 50, 250, 915, 980, 50, 250, TX_GREEN, "Kolichestvo patronov \nu dobroi butylki"};
 
 
     txCreateWindow(1000, 600);
@@ -365,6 +400,11 @@ int main()
         t = t + 10;
 
         pauza(&pb,&vrag);
+
+        shkala1.rectMinY = shkala1.rectMaxY - 120 * vrag.count_bullets / OBJOM_MAGAZINA;
+        drawShkala(&shkala1);
+        showHint(&shkala1);
+
         txSleep(10);
 
 
