@@ -88,6 +88,10 @@ void drawBulletVraga(Bullet *bullet)
 
 void pauza(Butylka* pb, Butylka* vrag)
 {
+    int minX = 220;
+    int maxX = 370;
+    int begunokX = minX + (maxX - minX) * pb->hp / 100;
+
     if (GetAsyncKeyState('P')) {
         txSelectFont("Times New Roman", 50);
         txSetColor(TX_BLACK);
@@ -102,23 +106,49 @@ void pauza(Butylka* pb, Butylka* vrag)
         while(!GetAsyncKeyState('P')) {
             char hp[100];
             sprintf(hp, "HP = %d", pb->hp);
-            txRectangle(220, 180, 370, 220);
-            txDrawText(220, 180, 370, 220, hp);
+            txRectangle(minX, 180, maxX, 220);
+            txDrawText(minX, 180, maxX, 220, hp);
+
+            //begunok
+            txRectangle(begunokX - 10, 230, begunokX + 10, 250);
+            txLine(begunokX - 10, 250, begunokX     , 260);
+            txLine(begunokX + 10, 250, begunokX     , 260);
 
             if (txMouseButtons() & 1 &&
-                txMouseX() >=120 &&
-                txMouseX() <=170 &&
-                txMouseY() >=180 &&
-                txMouseY() <=220) {
+                pb->hp > 0 &&
+                txMouseX() >=120 && txMouseX() <=170 &&
+                txMouseY() >=180 && txMouseY() <=220) {
                 pb->hp = pb->hp - 1;
             }
             if (txMouseButtons() & 1 &&
-                txMouseX() >=420 &&
-                txMouseX() <=470 &&
-                txMouseY() >=180 &&
-                txMouseY() <=220) {
+                pb->hp < 100 &&
+                txMouseX() >=420 && txMouseX() <=470 &&
+                txMouseY() >=180 && txMouseY() <=220) {
                 pb->hp = pb->hp + 1;
             }
+
+
+            if (txMouseX() >= begunokX - 10 && txMouseX() <=begunokX + 10 &&
+                txMouseY() >= 230 && txMouseY() <= 260) {
+
+                while (txMouseButtons() & 1) {
+                    begunokX = txMouseX();
+                    pb->hp = (begunokX - minX) / 1.5;
+
+                    txSetColor(TX_GREEN);
+                    txRectangle(minX - 10, 230, maxX + 10, 265);
+                    txSetColor(TX_BLACK);
+                    txRectangle(begunokX - 10, 230, begunokX + 10, 250);
+                    txLine(begunokX - 10, 250, begunokX     , 260);
+                    txLine(begunokX + 10, 250, begunokX     , 260);
+                }
+
+            }
+            //Нажали мышкой на бегунок
+            //Кнопка нажата, мышка движется
+            //Кнопка отжата
+
+
             txSleep(50);
         }
 
